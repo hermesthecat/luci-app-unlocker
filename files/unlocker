@@ -1,0 +1,182 @@
+#!/bin/sh /etc/rc.common
+# Copyright 2018 Alex D (https://gitlab.com/Nooblord/)
+# This is free software, licensed under the GNU General Public License v3.
+
+START=99
+CONFIG=unlocker
+
+# Main logic
+start()
+{
+    logger -t UNLOCKER "Starting unlocker."
+    
+    # Check if already running
+    if [ -f /tmp/unlocker_starting.pid ]; then
+        read -r unlocker_starting < /tmp/unlocker_starting.pid
+        kill -9 "$unlocker_starting" 2>/dev/null
+    fi
+    # Make pid
+    echo $$ > /tmp/unlocker_starting.pid
+
+    # Read settings
+    local enabled
+    enabled=$(uci get unlocker.@unlocker[0].enabled 2>/dev/null)
+    local proxy_mode
+    proxy_mode=$(uci get unlocker.@unlocker[0].proxy_mode 2>/dev/null)
+
+    # TODO Checks for ipset, coreutils , curl and all
+    # other needed stuff. If not present - exit
+    # Next check for check desired proxy_mode reqs
+    # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+    if ! command -v ipset >/dev/null; then
+        logger -t UNLOCKER "No ipset installed - trying to install and stopping."
+        opkg update && opkg install ipset
+        rm -f /tmp/unlocker_starting.pid  2>/dev/null
+        exit 1
+    fi
+
+    # If unlocker is disabled - exit
+    if [ ! "$enabled" = 1 ]; then
+        logger -t UNLOCKER "Unlocker is disabled - exiting."
+        rm -f /tmp/unlocker_starting.pid  2>/dev/null
+        exit 1
+    fi
+
+    logger -t UNLOCKER "Flushing unlocker firewall chains."
+
+    firewall_flush_all
+
+if [ "$proxy_mode" = "T" ]; then
+    if ! command -v tor >/dev/null; then
+        logger -t "TOR is not installed - trying to install and stopping."
+        opkg update && opkg install tor-geoip
+        rm -f /tmp/unlocker_starting.pid  2>/dev/null
+        exit 1
+    fi
+    logger -t UNLOCKER "TOR is selected - creating chains."
+    firewall_create_tor
+
+fi
+logger -t UNLOCKER "Finished starting."
+rm -f /tmp/unlocker_starting.pid  2>/dev/null
+    # Create rules based on desired IP (TODO DNS) lists
+}
+
+
+ipset_destroy_all()
+{
+    ipset destroy rkn_net 2>/dev/null
+    ipset destroy rkn2 2>/dev/null
+    ipset destroy rkn 2>/dev/null
+    ipset destroy custom_ip 2>/dev/null
+    ipset destroy custom_net 2>/dev/null
+    logger -t UNLOCKER "Destroyed ip lists in memory"
+}
+
+ipset_create()
+{
+    local iplists
+    iplists=$(uci get unlocker.@unlocker[0].iplists 2>/dev/null)
+    if [ -z "$iplists" ]; then
+        logger -t UNLOCKER "No lists defined for bypassing - exiting."
+        exit 1
+    fi
+    for iplist in $iplists ; do
+        case $iplist in
+            RKNIPLIST )
+                update_rkniplist
+                ;;
+        esac
+    done
+}
+
+
+update_rkniplist()
+{
+    local rkniplistcron
+    rkniplistcron=$(uci get unlocker.@unlocker[0].rkniplistcron 2>/dev/null)
+    if [ ! "$rkniplistcron" = 1 ]; then
+        cron_rkniplist_add
+    else
+        cron_rkniplist_del
+    fi
+
+    ipset destroy rkn_net 2>/dev/null
+    ipset destroy rkn2 2>/dev/null
+    ipset destroy rkn 2>/dev/null
+    
+    wget -qO - http://lionhearts.ru/rkn_net.ipset | ipset restore
+    wget -qO - http://lionhearts.ru/rkn2.ipset | ipset restore
+    wget -qO - http://lionhearts.ru/rkn.ipset | ipset restore
+
+    logger -t UNLOCKER "Set RKNIPLIST is updated and loaded in memory"
+
+}
+
+cron_rkniplist_add()
+{   
+    sed -i '/update_rkniplist/d' /etc/crontabs/root
+}
+
+cron_rkniplist_del()
+{
+    sed -i '/update_rkniplist/d' /etc/crontabs/root
+}
+
+
+
+firewall_flush_all()
+{
+    # Remove custom user TCP chain and flush all checks
+    if iptables -t nat -F unlocker_check 2>/dev/null; then
+        while iptables -t nat -D PREROUTING -p tcp -j unlocker_check 2>/dev/null; do :; done
+        iptables -t nat -X unlocker_check 2>/dev/null
+    fi
+
+    # Remove custom user tor chain
+    iptables -t nat -F unlocker_tor 2>/dev/null
+    iptables -t nat -X unlocker_tor 2>/dev/null
+    logger -t UNLOCKER "Flushed firewall."
+}
+
+
+firewall_create_tor()
+{
+    local udp_proxy
+    udp_proxy=$(uci get unlocker.@unlocker[0].udp_proxy 2>/dev/null)
+    if [ "$udp_proxy" = "1" ]; then
+        logger -t UNLOCKER "UDP option selected - but TOR can't do that, sorry."
+    fi
+    
+    # Create lists for bypass
+    ipset_create
+    
+    # Create new user chains for unlocker check and tor
+    iptables -t nat -N unlocker_check 2>/dev/null
+    iptables -t nat -N unlocker_tor 2>/dev/null
+    
+    # Create integration with lists and create tcp prerouting rule for local lan
+    iptables -t nat -A unlocker_tor -s 192.168.1.0/24 -p tcp -j REDIRECT --to 9040 2>/dev/null
+    iptables -t nat -A unlocker_check -m set --match-set rkn dst -j unlocker_tor 2>/dev/null
+    iptables -t nat -A unlocker_check -m set --match-set rkn2 dst -j unlocker_tor 2>/dev/null
+    iptables -t nat -A unlocker_check -m set --match-set rkn_net dst -j unlocker_tor 2>/dev/null
+    iptables -t nat -A unlocker_check -m set --match-set custom_ip dst -j unlocker_tor 2>/dev/null
+    iptables -t nat -A unlocker_check -m set --match-set custom_net dst -j unlocker_tor 2>/dev/null
+    iptables -t nat -I PREROUTING -p tcp -j unlocker_check 2>/dev/null
+
+    logger -t UNLOCKER "TOR Chain loaded in firewall"
+}
+
+stop()
+{
+    logger -t UNLOCKER "Stopping unlocker."
+    ipset_destroy_all
+    firewall_flush_all
+    logger -t UNLOCKER "Stopped."
+}
+
+reload()
+{
+    start
+}

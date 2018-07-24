@@ -1,0 +1,134 @@
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\n"
+
+msgid "Advanced IP-List Settings"
+msgstr ""
+
+msgid "Base Setting"
+msgstr ""
+
+msgid "Bypass Mode"
+msgstr ""
+
+msgid "Currently list is just loaded on boot."
+msgstr ""
+
+msgid "Custom IPv4"
+msgstr ""
+
+msgid "Custom IPv4 (TODO)"
+msgstr ""
+
+msgid "Direct edit of torrc file"
+msgstr ""
+
+msgid "Disable start on boot"
+msgstr ""
+
+msgid "Disabled"
+msgstr ""
+
+msgid "ENABLED on boot"
+msgstr ""
+
+msgid "Enable Unlocker"
+msgstr ""
+
+msgid "Enable list auto-update"
+msgstr ""
+
+msgid "Enable start on boot"
+msgstr ""
+
+msgid "Example:"
+msgstr ""
+
+msgid "Exclude your country exit nodes in config."
+msgstr ""
+
+msgid "Great Firewall IPv4"
+msgstr ""
+
+msgid "Great Firewall IPv4 (China)"
+msgstr ""
+
+msgid "IPv4 Bypass Lists"
+msgstr ""
+
+msgid "Install Tor"
+msgstr ""
+
+msgid "Logs"
+msgstr ""
+
+msgid "More info can be found here:"
+msgstr ""
+
+msgid "Multiple selection is allowed"
+msgstr ""
+
+msgid "NOT ENABLED on boot"
+msgstr ""
+
+msgid "Not ready yet..."
+msgstr ""
+
+msgid "Options are just dummy values"
+msgstr ""
+
+msgid "Restart Tor"
+msgstr ""
+
+msgid "Roscomnadzor IPv4"
+msgstr ""
+
+msgid "Roscomnadzor IPv4 (Russia)"
+msgstr ""
+
+msgid "Services Status:"
+msgstr ""
+
+msgid "Status: (TODO)"
+msgstr ""
+
+msgid "TOR is preferred and free but can't deal with UDP traffic"
+msgstr ""
+
+msgid "Tor Configuration"
+msgstr ""
+
+msgid "Tor is Running"
+msgstr ""
+
+msgid "Tor is not Installed"
+msgstr ""
+
+msgid "Tor is not Running"
+msgstr ""
+
+msgid "Tor log"
+msgstr ""
+
+msgid "Unified solution against internet censorship"
+msgstr ""
+
+msgid "Uninstall Tor"
+msgstr ""
+
+msgid "Unlocker"
+msgstr ""
+
+msgid "Unlocker log"
+msgstr ""
+
+msgid "Use ShadowSocks (TODO)"
+msgstr ""
+
+msgid "Use TOR Network (TCP Only)"
+msgstr ""
+
+msgid "and"
+msgstr ""
+
+msgid "with PID"
+msgstr ""
