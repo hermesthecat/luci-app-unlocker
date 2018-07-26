@@ -106,9 +106,9 @@ update_rkniplist()
     ipset destroy rkn2 2>/dev/null
     ipset destroy rkn 2>/dev/null
     
-    wget -qO - http://lionhearts.ru/rkn_net.ipset | ipset restore
-    wget -qO - http://lionhearts.ru/rkn2.ipset | ipset restore
-    wget -qO - http://lionhearts.ru/rkn.ipset | ipset restore
+    wget -qO - http://nooblord.gitlab.io/ipset-lists/rkn_net.ipset | ipset restore
+    wget -qO - http://nooblord.gitlab.io/ipset-lists/rkn2.ipset | ipset restore
+    wget -qO - http://nooblord.gitlab.io/ipset-lists/rkn.ipset | ipset restore
 
     logger -t UNLOCKER "Set RKNIPLIST is updated and loaded in memory"
 
