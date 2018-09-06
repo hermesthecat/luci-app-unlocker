@@ -43,7 +43,7 @@ msgstr ""
 msgid "Example:"
 msgstr ""
 
-msgid "Exclude your country exit nodes in config."
+msgid "Exclude your country exit nodes in config. And add TransPort."
 msgstr ""
 
 msgid "Great Firewall IPv4"

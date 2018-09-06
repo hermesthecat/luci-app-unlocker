@@ -43,8 +43,8 @@ msgstr "Загружать при старте"
 msgid "Example:"
 msgstr "Пример:"
 
-msgid "Exclude your country exit nodes in config."
-msgstr "Рекоммендуется отключить исходящие ноды Tor своей страны."
+msgid "Exclude your country exit nodes in config. And add TransPort."
+msgstr "Добавьте в конфигурацию Tor порт прозрачного прокси. Так же рекоммендуется отключить исходящие ноды Tor своей страны."
 
 msgid "Great Firewall IPv4"
 msgstr "Великий Фаерволл IPv4"
@@ -134,3 +134,4 @@ msgstr "и"
 
 msgid "with PID"
 msgstr "c PID"
+

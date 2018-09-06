@@ -15,8 +15,11 @@ local endbold = "</strong>"
 local brtag ="<br />"
 local helpicon = '<span class="cbi-value-helpicon"><img src="/luci-static/reso'..
 				 'urces/cbi/help.gif" alt="help" /></span>'
-local torrcHelp = translate("Exclude your country exit nodes in config.") ..
+local torrcHelp = translate("Exclude your country exit nodes in config. And add TransPort.") ..
 				  brtag .. translate("Example: ") .. bold .. brtag ..
+				  "User tor" .. brtag ..
+				  "AutomapHostsOnResolve 1" .. brtag ..
+				  "TransPort 0.0.0.0:9040" .. brtag ..
 				  "StrictNodes 1".. brtag ..
 				  "ExcludeExitNodes {ru},{ua},{kz},{by}" .. endbold .. brtag ..
 				  translate("More info can be found here: ") .. 
