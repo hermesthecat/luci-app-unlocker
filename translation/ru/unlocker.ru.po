@@ -10,6 +10,9 @@ msgstr "Основные настройки"
 msgid "Bypass Mode"
 msgstr "Способ обхода"
 
+msgid "Creates a simple Tor Config for unlocker"
+msgstr "По нажатию этой кнопки Tor будет сконфигурирован на работу с разблокировщиком"
+
 msgid "Currently list is just loaded on boot."
 msgstr "На данный момент список обновляется при каждой загрузке."
 
@@ -44,7 +47,9 @@ msgid "Example:"
 msgstr "Пример:"
 
 msgid "Exclude your country exit nodes in config. And add TransPort."
-msgstr "Добавьте в конфигурацию Tor порт прозрачного прокси. Так же рекоммендуется отключить исходящие ноды Tor своей страны."
+msgstr ""
+"Добавьте в конфигурацию Tor порт прозрачного прокси. Так же рекоммендуется "
+"отключить исходящие ноды Tor своей страны."
 
 msgid "Great Firewall IPv4"
 msgstr "Великий Фаерволл IPv4"
@@ -60,6 +65,9 @@ msgstr "Установить Tor"
 
 msgid "Logs"
 msgstr "Логи"
+
+msgid "Make me Tor Config"
+msgstr "Настрой мне Tor"
 
 msgid "More info can be found here:"
 msgstr "Можно почитать тут: "
@@ -134,4 +142,3 @@ msgstr "и"
 
 msgid "with PID"
 msgstr "c PID"
-

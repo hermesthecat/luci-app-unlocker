@@ -5,6 +5,8 @@
 START=99
 CONFIG=unlocker
 
+. /lib/functions/network.sh
+
 # Main logic
 start()
 {
@@ -144,6 +146,8 @@ firewall_flush_all()
 firewall_create_tor()
 {
     local udp_proxy
+    local subnets4
+    network_get_subnets subnets4 lan
     udp_proxy=$(uci get unlocker.@unlocker[0].udp_proxy 2>/dev/null)
     if [ "$udp_proxy" = "1" ]; then
         logger -t UNLOCKER "UDP option selected - but TOR can't do that, sorry."
@@ -157,7 +161,10 @@ firewall_create_tor()
     iptables -t nat -N unlocker_tor 2>/dev/null
     
     # Create integration with lists and create tcp prerouting rule for local lan
-    iptables -t nat -A unlocker_tor -s 192.168.1.0/24 -p tcp -j REDIRECT --to 9040 2>/dev/null
+    for subnet in $subnets4; do
+        iptables -t nat -A unlocker_tor -s "$subnet" -p tcp -j REDIRECT --to 9040 2>/dev/null
+    done
+    
     iptables -t nat -A unlocker_check -m set --match-set rkn dst -j unlocker_tor 2>/dev/null
     iptables -t nat -A unlocker_check -m set --match-set rkn2 dst -j unlocker_tor 2>/dev/null
     iptables -t nat -A unlocker_check -m set --match-set rkn_net dst -j unlocker_tor 2>/dev/null

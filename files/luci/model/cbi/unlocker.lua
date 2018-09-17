@@ -7,6 +7,12 @@ require "ubus"
 
 -- [GLOBAL VARS] --------------------------------------------------------------
 local torrc = "/etc/tor/torrc"
+local torrcSampleConfig = 'User tor\n' ..
+						  'AutomapHostsOnResolve 1\n' ..
+						  'TransPort 0.0.0.0:9040\n' ..
+						  'StrictNodes 1\n' ..
+						  'ExcludeExitNodes {ru},{ua},{kz},{by}\n'
+
 local fontred = "<font color=\"red\">"
 local fontgreen = "<font color=\"green\">"
 local endfont = "</font>"
@@ -143,7 +149,7 @@ if torBinary ~= "" then
 		luci.sys.exec("sleep 1")
 		luci.http.redirect(luci.dispatcher.build_url("admin", "services", "unlocker"))
 	end
-	torrcButtonRemove = s:taboption("torConfig",Button,"Uninstall TorR"," ")
+	torrcButtonRemove = s:taboption("torConfig",Button,"Uninstall Tor"," ")
 	torrcButtonRemove:depends("proxy_mode","T")
 	torrcButtonRemove.inputtitle=translate("Uninstall Tor")
 	torrcButtonRemove.inputstyle="remove"
@@ -173,6 +179,16 @@ if torBinary ~= "" then
 			luci.sys.exec("sleep 1")
 			luci.http.redirect(luci.dispatcher.build_url("admin", "services", "unlocker"))
 		end
+	end
+	torrcButtonConfig = s:taboption("torConfig",Button,translate("Make me Tor Config")," ",
+									translate("Creates a simple Tor Config for unlocker"))
+	torrcButtonConfig:depends("proxy_mode","T")
+	torrcButtonConfig.inputtitle=translate("Make me Tor Config")
+	torrcButtonConfig.inputstyle="apply"
+	function torrcButtonConfig.write() 
+		luci.sys.exec("echo -e \"" .. torrcSampleConfig .. "\" > " .. torrc)
+		luci.sys.exec("sleep 1")
+		luci.http.redirect(luci.dispatcher.build_url("admin", "services", "unlocker"))
 	end
 else
 	torrcButtonInstall = s:taboption("torConfig",Button,"Install Tor",
@@ -214,6 +230,7 @@ if nixio.fs.access(torrc) then
 		end
 	end
 end
+
 -------------------------------------------------------------------------------
 
 -- [ LOGS TAB] ----------------------------------------------------------------

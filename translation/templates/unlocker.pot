@@ -10,6 +10,9 @@ msgstr ""
 msgid "Bypass Mode"
 msgstr ""
 
+msgid "Creates a simple Tor Config for unlocker"
+msgstr ""
+
 msgid "Currently list is just loaded on boot."
 msgstr ""
 
@@ -59,6 +62,9 @@ msgid "Install Tor"
 msgstr ""
 
 msgid "Logs"
+msgstr ""
+
+msgid "Make me Tor Config"
 msgstr ""
 
 msgid "More info can be found here:"
