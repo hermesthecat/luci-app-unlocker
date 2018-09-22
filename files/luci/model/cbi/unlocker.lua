@@ -387,9 +387,8 @@ end
 
 -------------------------------------------------------------------------------
 
--- local apply = luci.http.formvalue("cbi.apply")
--- if apply then
--- 	os.execute("/etc/init.d/unlocker restart >/dev/null 2>&1 &")
--- end
+if luci.http.formvalue("cbi.apply") then
+	luci.sys.exec("/etc/init.d/unlocker restart >/dev/null 2>&1 &")
+end
 
 return m

@@ -4,9 +4,9 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=luci-app-unlocker
-PKG_VERSION:=1.3
-PKG_RELEASE:=4
-PKG_MAINTAINER:=Alexander Donets <alex@dreamisdead.tk>
+PKG_VERSION:=1.4
+PKG_RELEASE:=5
+PKG_MAINTAINER:=Alex D <alex@dreamisdead.tk>
 PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)
 
 include $(INCLUDE_DIR)/package.mk
