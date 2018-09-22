@@ -3,9 +3,9 @@
 unlocker_enabled=$(uci get unlocker.@unlocker[0].enabled 2>/dev/null)
 
 if [ "$unlocker_enabled" -eq 1 ]; then
-	if pidof tor 2>/dev/null || pidof ss-redir 2>/dev/null ; then
-	   /etc/init.d/unlocker reload
-	 else
-	   /etc/init.d/unlocker restart
-  fi
+    if pidof tor 2>/dev/null || pidof ss-redir 2>/dev/null ; then
+       /etc/init.d/unlocker reload
+    else
+       /etc/init.d/unlocker restart
+    fi
 fi

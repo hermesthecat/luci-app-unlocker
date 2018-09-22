@@ -10,16 +10,16 @@ msgstr ""
 msgid "Bypass Mode"
 msgstr ""
 
-msgid "Creates a simple Tor Config for unlocker"
+msgid "Creates a simple Tor config for unlocker"
 msgstr ""
 
 msgid "Currently list is just loaded on boot."
 msgstr ""
 
-msgid "Custom IPv4"
+msgid "Custom Domain List"
 msgstr ""
 
-msgid "Custom IPv4 (TODO)"
+msgid "Custom IPv4"
 msgstr ""
 
 msgid "Direct edit of torrc file"
@@ -29,6 +29,9 @@ msgid "Disable start on boot"
 msgstr ""
 
 msgid "Disabled"
+msgstr ""
+
+msgid "Domain Bypass Lists"
 msgstr ""
 
 msgid "ENABLED on boot"
@@ -49,7 +52,7 @@ msgstr ""
 msgid "Exclude your country exit nodes in config. And add TransPort."
 msgstr ""
 
-msgid "Great Firewall IPv4"
+msgid "Great Firewall"
 msgstr ""
 
 msgid "Great Firewall IPv4 (China)"
@@ -64,13 +67,13 @@ msgstr ""
 msgid "Logs"
 msgstr ""
 
-msgid "Make me Tor Config"
+msgid "Make me Tor config"
 msgstr ""
 
 msgid "More info can be found here:"
 msgstr ""
 
-msgid "Multiple selection is allowed"
+msgid "Multiple selection is allowed."
 msgstr ""
 
 msgid "NOT ENABLED on boot"
@@ -79,16 +82,16 @@ msgstr ""
 msgid "Not ready yet..."
 msgstr ""
 
-msgid "Options are just dummy values"
+msgid "Requires dnsmasq-full!"
 msgstr ""
 
 msgid "Restart Tor"
 msgstr ""
 
-msgid "Roscomnadzor IPv4"
+msgid "Roscomnadzor"
 msgstr ""
 
-msgid "Roscomnadzor IPv4 (Russia)"
+msgid "Roscomnadzor (Russia)"
 msgstr ""
 
 msgid "Services Status:"
@@ -130,7 +133,7 @@ msgstr ""
 msgid "Use ShadowSocks (TODO)"
 msgstr ""
 
-msgid "Use TOR Network (TCP Only)"
+msgid "Use Tor network"
 msgstr ""
 
 msgid "and"

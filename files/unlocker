@@ -68,12 +68,12 @@ rm -f /tmp/unlocker_starting.pid  2>/dev/null
 
 ipset_destroy_all()
 {
-    ipset destroy rkn_net 2>/dev/null
-    ipset destroy rkn2 2>/dev/null
-    ipset destroy rkn 2>/dev/null
-    ipset destroy custom_ip 2>/dev/null
-    ipset destroy custom_net 2>/dev/null
-    logger -t UNLOCKER "Destroyed ip lists in memory"
+    ipset destroy rkn_net 2>/dev/null || ipset flush rkn_net 2>/dev/null
+    ipset destroy rkn2 2>/dev/null || ipset flush rkn2 2>/dev/null
+    ipset destroy rkn 2>/dev/null || ipset flush rkn 2>/dev/null
+    ipset destroy custom_ip 2>/dev/null || ipset flush custom_ip 2>/dev/null
+    ipset destroy custom_net 2>/dev/null || ipset flush custom_net 2>/dev/null
+    logger -t UNLOCKER "Destroyed or flushed ip lists in memory"
 }
 
 ipset_create()
@@ -88,6 +88,9 @@ ipset_create()
         case $iplist in
             RKNIPLIST )
                 update_rkniplist
+                ;;            
+            CUSTOMIPLIST )
+                update_customiplist
                 ;;
         esac
     done
@@ -97,33 +100,78 @@ ipset_create()
 update_rkniplist()
 {
     local rkniplistcron
-    rkniplistcron=$(uci get unlocker.@unlocker[0].rkniplistcron 2>/dev/null)
-    if [ ! "$rkniplistcron" = 1 ]; then
+    local ipset_download_link
+    rkniplistcron=$(uci get unlocker.@unlocker[0].rknListOptions 2>/dev/null)
+    
+    # determine if device supports https TODO
+
+    if [[ "$(wget -qO - https://nooblord.gitlab.io/ipset-lists/rkn_net.ipset | grep create )" != "" ]]; then
+        ipset_download_link="https://nooblord.gitlab.io/ipset-lists"
+    else
+        ipset_download_link="http://unlocker.lionhearts.ru"
+    fi
+
+
+    if [ "$rkniplistcron" = "RKNLISTCRON" ]; then
         cron_rkniplist_add
     else
         cron_rkniplist_del
     fi
 
-    ipset destroy rkn_net 2>/dev/null
-    ipset destroy rkn2 2>/dev/null
-    ipset destroy rkn 2>/dev/null
-    
-    wget -qO - http://nooblord.gitlab.io/ipset-lists/rkn_net.ipset | ipset restore
-    wget -qO - http://nooblord.gitlab.io/ipset-lists/rkn2.ipset | ipset restore
-    wget -qO - http://nooblord.gitlab.io/ipset-lists/rkn.ipset | ipset restore
+    if [[ "$(ping -c 1 8.8.8.8 | grep '100% packet loss' )" != "" ]]; then
 
-    logger -t UNLOCKER "Set RKNIPLIST is updated and loaded in memory"
+        logger -t UNLOCKER "Can not update list - internet is down."
+    else
+        logger -t UNLOCKER "Starting RKNIPLIST update"
 
+        ipset destroy rkn_net 2>/dev/null || ipset flush rkn_net 2>/dev/null
+        ipset destroy rkn2 2>/dev/null || ipset flush rkn2 2>/dev/null
+        ipset destroy rkn 2>/dev/null || ipset flush rkn 2>/dev/null
+        
+        wget -qO - $ipset_download_link/rkn_net.ipset | ipset restore || \
+        wget -qO - $ipset_download_link/rkn_net.ipset | sed '1d' | ipset restore
+        wget -qO - $ipset_download_link/rkn2.ipset | ipset restore || \
+        wget -qO - $ipset_download_link/rkn2.ipset | sed '1d' | ipset restore
+        wget -qO - $ipset_download_link/rkn.ipset | ipset restore || \
+        wget -qO - $ipset_download_link/rkn.ipset | sed '1d' | ipset restore
+
+
+        logger -t UNLOCKER "Set RKNIPLIST is updated and loaded in memory"
+    fi
+}
+
+update_customiplist()
+{
+        ipset destroy custom_ip 2>/dev/null || ipset flush rkn_net 2>/dev/null
+        ipset destroy custom_net 2>/dev/null || ipset flush rkn2 2>/dev/null
+        if [ -f /etc/unlocker.ipv4ip ]; then
+            cat /etc/unlocker.ipv4ip | ipset restore 2>/dev/null || \
+            cat /etc/unlocker.ipv4ip | sed '1d' | ipset restore 2>/dev/null
+        fi
+
+        if [ -f /etc/unlocker.ipv4net ]; then
+            cat /etc/unlocker.ipv4net | ipset restore 2>/dev/null || \
+            cat /etc/unlocker.ipv4net | sed '1d' | ipset restore 2>/dev/null
+        fi
+        logger -t UNLOCKER "Custom IPSET rules are updated and loaded in memory"
 }
 
 cron_rkniplist_add()
 {   
-    sed -i '/update_rkniplist/d' /etc/crontabs/root
+    if ! grep -q 'update_rkniplist' /etc/crontabs/root ; then
+        mkdir -p /etc/crontabs/ 2>/dev/null
+        #echo -e '0 0 * * * /etc/init.d/unlocker update_rkniplist 2>/dev/null' >> /etc/crontabs/root
+        echo -e '0 0 * * * sh -c ". /etc/init.d/unlocker && update_rkniplist 2>/dev/null"' >> /etc/crontabs/root
+        /etc/init.d/cron restart
+        /etc/init.d/cron enable
+    fi
+    #sed -i '/update_rkniplist/d' /etc/crontabs/root
 }
 
 cron_rkniplist_del()
 {
     sed -i '/update_rkniplist/d' /etc/crontabs/root
+    /etc/init.d/cron restart
 }
 
 
