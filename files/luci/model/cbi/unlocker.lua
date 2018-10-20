@@ -388,7 +388,7 @@ end
 -------------------------------------------------------------------------------
 
 if luci.http.formvalue("cbi.apply") then
-	luci.sys.exec("/etc/init.d/unlocker restart >/dev/null 2>&1 &")
+	luci.sys.exec("sleep 5 && /etc/init.d/unlocker restart >/dev/null 2>&1 &")
 end
 
 return m
