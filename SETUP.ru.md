@@ -20,9 +20,9 @@
 - Ставим галочку напротив пункта "включить"
 - Выбираем подходящий режим прокси (в нашем случае - разблокировка через сеть Tor)
 - Выбираем необходимые списки и нажимаем сохранить и применить
-![image](https://gitlab.com/Nooblord/luci-app-unlocker/blob/master/screenshots/setup1.ru.png)
+![image](https://gitlab.com/Nooblord/luci-app-unlocker/raw/master/screenshots/setup1.ru.png)
 - Переходим во вкладку "Конфигурация Tor" и настраиваем аналогично примеру, либо нажимем кнопку "Сконфигурировать Tor", после чего ***необходимо перезапустить сервис Tor*** соответствующей кнопкой
-![image](https://gitlab.com/Nooblord/luci-app-unlocker/blob/master/screenshots/setup2.ru.png)
+![image](https://gitlab.com/Nooblord/luci-app-unlocker/raw/master/screenshots/setup2.ru.png)
 - Нажимаем сохранить и применить, готово!
 - Проверяем работу плагина, и если есть ошибки - смотрим журнал
 

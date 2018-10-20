@@ -20,9 +20,9 @@
 - Check "Enable Unlocker" checkbox
 - Select appropriate proxy mode (Tor in our case)
 - Select needed ip-lists and press "save and apply"
-![image](https://gitlab.com/Nooblord/luci-app-unlocker/blob/master/screenshots/setup1.en.png)
+![image](https://gitlab.com/Nooblord/luci-app-unlocker/raw/master/screenshots/setup1.en.png)
 - Go to  "Tor Configuration" tab and edit torrc according to example below and save form or just press "Make me Tor Config" button, after that ***restart Tor service*** with "Restart Tor" button
-![image](https://gitlab.com/Nooblord/luci-app-unlocker/blob/master/screenshots/setup2.en.png)
+![image](https://gitlab.com/Nooblord/luci-app-unlocker/raw/master/screenshots/setup2.en.png)
 - Press "save and apply", done!
 - Check if plugin is working correctly and if not - check logs
 
