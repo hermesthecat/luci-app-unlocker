@@ -29,4 +29,5 @@
 ## Known possible problems
 
 - Unlocker works and there are no errors in log, but sites are still being blocked by ISP
+
 It is possible that your provider tampers with DNS requests, in this case you need to install DNS-over-TLS or just try to change upstream DNS to 1.1.1.1 or 8.8.8.8.
