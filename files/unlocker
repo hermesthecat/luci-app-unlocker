@@ -32,8 +32,10 @@ start()
     # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
     if ! command -v ipset >/dev/null; then
-        logger -t UNLOCKER "No ipset installed - trying to install and stopping."
-        opkg update && opkg install ipset
+        # For safety - do not tamper with pkgs
+        # logger -t UNLOCKER "No ipset installed - trying to install and stopping."
+        # opkg update && opkg install ipset
+        logger -t UNLOCKER "No ipset installed - stopping."
         rm -f /tmp/unlocker_starting.pid  2>/dev/null
         exit 1
     fi
@@ -51,9 +53,11 @@ start()
 
 if [ "$proxy_mode" = "T" ]; then
     if ! command -v tor >/dev/null; then
-        logger -t "TOR is not installed - trying to install and stopping."
-        opkg update && opkg install tor-geoip
-        rm -f /tmp/unlocker_starting.pid  2>/dev/null
+        # For safety - do not tamper with pkgs
+        # logger -t "TOR is not installed - trying to install and stopping."
+        # opkg update && opkg install tor-geoip
+        logger -t "TOR is not installed - stopping."
+        rm -f /tmp/unlocker_starting.pid 2>/dev/null
         exit 1
     fi
     logger -t UNLOCKER "TOR is selected - creating chains."
@@ -108,7 +112,7 @@ update_rkniplist()
     if [[ "$(wget -qO - https://nooblord.gitlab.io/ipset-lists/rkn_net.ipset | grep create )" != "" ]]; then
         ipset_download_link="https://nooblord.gitlab.io/ipset-lists"
     else
-        ipset_download_link="http://unlocker.lionhearts.ru"
+        ipset_download_link="http://lists.unlocker.xyz"
     fi
 
 
