@@ -73,6 +73,7 @@ rm -f /tmp/unlocker_starting.pid  2>/dev/null
 ipset_destroy_all()
 {
     ipset destroy rkn_net 2>/dev/null || ipset flush rkn_net 2>/dev/null
+    ipset destroy rkn3 2>/dev/null || ipset flush rkn3 2>/dev/null
     ipset destroy rkn2 2>/dev/null || ipset flush rkn2 2>/dev/null
     ipset destroy rkn 2>/dev/null || ipset flush rkn 2>/dev/null
     ipset destroy custom_ip 2>/dev/null || ipset flush custom_ip 2>/dev/null
@@ -129,11 +130,14 @@ update_rkniplist()
         logger -t UNLOCKER "Starting RKNIPLIST update"
 
         ipset destroy rkn_net 2>/dev/null || ipset flush rkn_net 2>/dev/null
+        ipset destroy rkn3 2>/dev/null || ipset flush rkn3 2>/dev/null
         ipset destroy rkn2 2>/dev/null || ipset flush rkn2 2>/dev/null
         ipset destroy rkn 2>/dev/null || ipset flush rkn 2>/dev/null
         
         wget -qO - $ipset_download_link/rkn_net.ipset | ipset restore || \
         wget -qO - $ipset_download_link/rkn_net.ipset | sed '1d' | ipset restore
+        wget -qO - $ipset_download_link/rkn3.ipset | ipset restore || \
+        wget -qO - $ipset_download_link/rkn3.ipset | sed '1d' | ipset restore
         wget -qO - $ipset_download_link/rkn2.ipset | ipset restore || \
         wget -qO - $ipset_download_link/rkn2.ipset | sed '1d' | ipset restore
         wget -qO - $ipset_download_link/rkn.ipset | ipset restore || \
@@ -146,8 +150,8 @@ update_rkniplist()
 
 update_customiplist()
 {
-        ipset destroy custom_ip 2>/dev/null || ipset flush rkn_net 2>/dev/null
-        ipset destroy custom_net 2>/dev/null || ipset flush rkn2 2>/dev/null
+        ipset destroy custom_ip 2>/dev/null || ipset flush custom_ip 2>/dev/null
+        ipset destroy custom_net 2>/dev/null || ipset flush custom_net 2>/dev/null
         if [ -f /etc/unlocker.ipv4ip ]; then
             cat /etc/unlocker.ipv4ip | ipset restore 2>/dev/null || \
             cat /etc/unlocker.ipv4ip | sed '1d' | ipset restore 2>/dev/null
@@ -219,6 +223,7 @@ firewall_create_tor()
     
     iptables -t nat -A unlocker_check -m set --match-set rkn dst -j unlocker_tor 2>/dev/null
     iptables -t nat -A unlocker_check -m set --match-set rkn2 dst -j unlocker_tor 2>/dev/null
+    iptables -t nat -A unlocker_check -m set --match-set rkn3 dst -j unlocker_tor 2>/dev/null
     iptables -t nat -A unlocker_check -m set --match-set rkn_net dst -j unlocker_tor 2>/dev/null
     iptables -t nat -A unlocker_check -m set --match-set custom_ip dst -j unlocker_tor 2>/dev/null
     iptables -t nat -A unlocker_check -m set --match-set custom_net dst -j unlocker_tor 2>/dev/null
