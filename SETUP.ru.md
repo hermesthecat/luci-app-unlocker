@@ -3,7 +3,7 @@
 ### Ставим пакеты для работы Разблокировщика 
 `opkg update`
 
-`opkg install tor tor-geoip ipset`
+`opkg install tor tor-geoip ipset usign`
 
 ### Добавляем репозиторий
 `echo -e -n 'untrusted comment: OpenWRT usign key of unlocker repo\nRWSAkINO7cGce05420qPyQYWqp9zMSCMflH2CF+kth6s0EnJOS6WLnd+\n' > /tmp/unlocker-repo.pub && opkg-key add /tmp/unlocker-repo.pub`
