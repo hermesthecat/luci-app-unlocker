@@ -130,23 +130,14 @@ update_rkniplist()
     else
         logger -t UNLOCKER "Starting RKNIPLIST update"
 
-        ipset destroy rkn_net 2>/dev/null || ipset flush rkn_net 2>/dev/null
-        ipset destroy rkn4 2>/dev/null || ipset flush rkn4 2>/dev/null
-        ipset destroy rkn3 2>/dev/null || ipset flush rkn3 2>/dev/null
-        ipset destroy rkn2 2>/dev/null || ipset flush rkn2 2>/dev/null
-        ipset destroy rkn 2>/dev/null || ipset flush rkn 2>/dev/null
-        
-        wget -qO - $ipset_download_link/rkn_net.ipset | ipset restore || \
-        wget -qO - $ipset_download_link/rkn_net.ipset | sed '1d' | ipset restore
-        wget -qO - $ipset_download_link/rkn3.ipset | ipset restore || \
-        wget -qO - $ipset_download_link/rkn3.ipset | sed '1d' | ipset restore
-        wget -qO - $ipset_download_link/rkn4.ipset | ipset restore || \
-        wget -qO - $ipset_download_link/rkn4.ipset | sed '1d' | ipset restore
-        wget -qO - $ipset_download_link/rkn2.ipset | ipset restore || \
-        wget -qO - $ipset_download_link/rkn2.ipset | sed '1d' | ipset restore
-        wget -qO - $ipset_download_link/rkn.ipset | ipset restore || \
-        wget -qO - $ipset_download_link/rkn.ipset | sed '1d' | ipset restore
+        for name in $(ipset list -name | grep rkn); do
+            ipset destroy $name 2>/dev/null || ipset flush $name 2>/dev/null
+        done
 
+        for name in $(wget -qO - $ipset_download_link/rkn.sets); do
+            wget -qO - $ipset_download_link/$name | ipset restore || \
+            wget -qO - $ipset_download_link/$name | sed '1d' | ipset restore
+        done
 
         logger -t UNLOCKER "Set RKNIPLIST is updated and loaded in memory"
     fi
@@ -172,12 +163,10 @@ cron_rkniplist_add()
 {   
     if ! grep -q 'update_rkniplist' /etc/crontabs/root ; then
         mkdir -p /etc/crontabs/ 2>/dev/null
-        #echo -e '0 0 * * * /etc/init.d/unlocker update_rkniplist 2>/dev/null' >> /etc/crontabs/root
         echo -e '0 0 * * * sh -c ". /etc/init.d/unlocker && update_rkniplist 2>/dev/null"' >> /etc/crontabs/root
         /etc/init.d/cron restart
         /etc/init.d/cron enable
     fi
-    #sed -i '/update_rkniplist/d' /etc/crontabs/root
 }
 
 cron_rkniplist_del()
@@ -186,6 +175,22 @@ cron_rkniplist_del()
     /etc/init.d/cron restart
 }
 
+determine_wg_l3_name()
+{
+    ubus call network.interface dump | jsonfilter -e '@.interface[@.proto="wireguard"].l3_device'
+}
+
+vpnroute_add()
+{
+    if ! grep -q 'unlockervpn' /etc/iproute2/rt_tables ; then
+        echo -e '115 unlockervpn' >> /etc/iproute2/rt_tables
+    fi
+}
+
+vpnroute_del()
+{
+    sed -i '/unlockervpn/d' /etc/iproute2/rt_tables
+}
 
 
 firewall_flush_all()
@@ -199,6 +204,8 @@ firewall_flush_all()
     # Remove custom user tor chain
     iptables -t nat -F unlocker_tor 2>/dev/null
     iptables -t nat -X unlocker_tor 2>/dev/null
+
+    # Remove custom wireguard chain
     logger -t UNLOCKER "Flushed firewall."
 }
 
@@ -225,13 +232,10 @@ firewall_create_tor()
         iptables -t nat -A unlocker_tor -s "$subnet" -p tcp -j REDIRECT --to 9040 2>/dev/null
     done
     
-    iptables -t nat -A unlocker_check -m set --match-set rkn dst -j unlocker_tor 2>/dev/null
-    iptables -t nat -A unlocker_check -m set --match-set rkn2 dst -j unlocker_tor 2>/dev/null
-    iptables -t nat -A unlocker_check -m set --match-set rkn3 dst -j unlocker_tor 2>/dev/null
-    iptables -t nat -A unlocker_check -m set --match-set rkn4 dst -j unlocker_tor 2>/dev/null
-    iptables -t nat -A unlocker_check -m set --match-set rkn_net dst -j unlocker_tor 2>/dev/null
-    iptables -t nat -A unlocker_check -m set --match-set custom_ip dst -j unlocker_tor 2>/dev/null
-    iptables -t nat -A unlocker_check -m set --match-set custom_net dst -j unlocker_tor 2>/dev/null
+    for ipset in $(ipset list -name | grep '[rkn,custom]' | sort); do
+        iptables -t nat -A unlocker_check -m set --match-set "$ipset" dst -j unlocker_tor 2>/dev/null
+    done
+
     iptables -t nat -I PREROUTING -p tcp -j unlocker_check 2>/dev/null
 
     logger -t UNLOCKER "TOR Chain loaded in firewall"
