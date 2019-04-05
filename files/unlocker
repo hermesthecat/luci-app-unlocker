@@ -72,13 +72,9 @@ rm -f /tmp/unlocker_starting.pid  2>/dev/null
 
 ipset_destroy_all()
 {
-    ipset destroy rkn_net 2>/dev/null || ipset flush rkn_net 2>/dev/null
-    ipset destroy rkn4 2>/dev/null || ipset flush rkn4 2>/dev/null
-    ipset destroy rkn3 2>/dev/null || ipset flush rkn3 2>/dev/null
-    ipset destroy rkn2 2>/dev/null || ipset flush rkn2 2>/dev/null
-    ipset destroy rkn 2>/dev/null || ipset flush rkn 2>/dev/null
-    ipset destroy custom_ip 2>/dev/null || ipset flush custom_ip 2>/dev/null
-    ipset destroy custom_net 2>/dev/null || ipset flush custom_net 2>/dev/null
+    for ipset_name in $(ipset list -name | grep '[rkn,custom]' | sort); do
+        ipset destroy $ipset_name 2>/dev/null || ipset flush $ipset_name 2>/dev/null
+    done
     logger -t UNLOCKER "Destroyed or flushed ip lists in memory"
 }
 
