@@ -64,6 +64,18 @@ if [ "$proxy_mode" = "T" ]; then
     firewall_create_tor
 
 fi
+
+if [ "$proxy_mode" = "W" ]; then
+    if ! command -v wg >/dev/null; then
+        logger -t "WireGuard is not installed - stopping."
+        rm -f /tmp/unlocker_starting.pid 2>/dev/null
+        exit 1
+    fi
+    logger -t UNLOCKER "TOR is selected - creating chains."
+    firewall_create_wg
+
+fi
+
 logger -t UNLOCKER "Finished starting."
 rm -f /tmp/unlocker_starting.pid  2>/dev/null
     # Create rules based on desired IP (TODO DNS) lists
@@ -181,20 +193,37 @@ vpnroute_add()
     if ! grep -q 'unlockervpn' /etc/iproute2/rt_tables ; then
         echo -e '115 unlockervpn' >> /etc/iproute2/rt_tables
     fi
+
+    ip route add table unlockervpn default dev "$(determine_wg_l3_name)" 2>/dev/null
+    ip rule add prio 100 fwmark 115 lookup unlockervpn 2>/dev/null
+
 }
 
 vpnroute_del()
 {
     sed -i '/unlockervpn/d' /etc/iproute2/rt_tables
+    ip route flush table unlockervpn 2>/dev/null
 }
 
 
 firewall_flush_all()
 {
-    # Remove custom user TCP chain and flush all checks
+
+    # Remove vpn route
+    vpnroute_del
+
+    # Remove custom nat user chains and flush all checks
     if iptables -t nat -F unlocker_check 2>/dev/null; then
         while iptables -t nat -D PREROUTING -p tcp -j unlocker_check 2>/dev/null; do :; done
+        while iptables -t nat -D PREROUTING -p udp -j unlocker_check 2>/dev/null; do :; done
         iptables -t nat -X unlocker_check 2>/dev/null
+    fi    
+
+    # Remove custom mangle user chains and flush all checks
+    if iptables -t mangle -F unlocker_check 2>/dev/null; then
+        while iptables -t mangle -D PREROUTING -p tcp -j unlocker_check 2>/dev/null; do :; done
+        while iptables -t mangle -D PREROUTING -p udp -j unlocker_check 2>/dev/null; do :; done
+        iptables -t mangle -X unlocker_check 2>/dev/null
     fi
 
     # Remove custom user tor chain
@@ -202,8 +231,12 @@ firewall_flush_all()
     iptables -t nat -X unlocker_tor 2>/dev/null
 
     # Remove custom wireguard chain
+    iptables -t mangle -F unlocker_wg 2>/dev/null
+    iptables -t mangle -X unlocker_wg 2>/dev/null
+
     logger -t UNLOCKER "Flushed firewall."
 }
+
 
 
 firewall_create_tor()
@@ -211,10 +244,10 @@ firewall_create_tor()
     local udp_proxy
     local subnets4
     network_get_subnets subnets4 lan
-    udp_proxy=$(uci get unlocker.@unlocker[0].udp_proxy 2>/dev/null)
-    if [ "$udp_proxy" = "1" ]; then
-        logger -t UNLOCKER "UDP option selected - but TOR can't do that, sorry."
-    fi
+    # udp_proxy=$(uci get unlocker.@unlocker[0].udp_proxy 2>/dev/null)
+    # if [ "$udp_proxy" = "1" ]; then
+    #     logger -t UNLOCKER "UDP option selected - but TOR can't do that, sorry."
+    # fi
     
     # Create lists for bypass
     ipset_create
@@ -236,6 +269,39 @@ firewall_create_tor()
 
     logger -t UNLOCKER "TOR Chain loaded in firewall"
 }
+
+firewall_create_wg()
+{
+    local udp_proxy
+    local subnets4
+    network_get_subnets subnets4 lan
+    #udp_proxy=$(uci get unlocker.@unlocker[0].udp_proxy 2>/dev/null)
+    
+    # Create lists for bypass
+    ipset_create
+
+    # Add vpn route
+    vpnroute_add
+    
+    # Create new user chains for unlocker check and tor
+    iptables -t mangle -N unlocker_check 2>/dev/null
+    iptables -t mangle -N unlocker_wg 2>/dev/null
+    
+    # Create integration with lists and create prerouting rule for local lan
+    for subnet in $subnets4; do
+        iptables -A unlocker_wg -s "$subnet" -t mangle -j MARK --set-mark 115
+    done
+    
+    for ipset in $(ipset list -name | grep '[rkn,custom]' | sort); do
+        iptables -t mangle -A unlocker_check -m set --match-set "$ipset" dst -j unlocker_wg 2>/dev/null
+    done
+
+    iptables -t mangle -I PREROUTING -p tcp -j unlocker_check 2>/dev/null
+    iptables -t mangle -I PREROUTING -p udp -j unlocker_check 2>/dev/null
+
+    logger -t UNLOCKER "WG Chain loaded in firewall"
+}
+
 
 stop()
 {

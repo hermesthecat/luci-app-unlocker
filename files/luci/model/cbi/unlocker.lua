@@ -130,6 +130,9 @@ proxy_mode = s:taboption("basic",ListValue, "proxy_mode", translate("Bypass Mode
 		translate("TOR is preferred and free but can't deal with UDP traffic"))
 proxy_mode:value("D", translate("Disabled"))
 proxy_mode:value("T", translate("Use Tor network"))
+if luci.util.exec("/usr/bin/which wg") ~= "" then
+	proxy_mode:value("W", translate("Use WireGuard VPN"))
+end
 --proxy_mode:value("S", translate("Use ShadowSocks (TODO)"))
 -------------------------------------------------------------------------------
 

@@ -140,6 +140,9 @@ msgstr "Использовать ShadowSocks (TODO)"
 msgid "Use Tor network"
 msgstr "Использовать Tor"
 
+msgid "Use WireGuard VPN"
+msgstr "Использовать WireGuard"
+
 msgid "and"
 msgstr "и"
 

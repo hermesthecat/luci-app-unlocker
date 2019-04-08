@@ -136,6 +136,9 @@ msgstr ""
 msgid "Use Tor network"
 msgstr ""
 
+msgid "Use WireGuard VPN"
+msgstr ""
+
 msgid "and"
 msgstr ""
 
