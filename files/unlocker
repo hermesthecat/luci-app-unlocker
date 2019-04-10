@@ -54,13 +54,13 @@ start()
 if [ "$proxy_mode" = "T" ]; then
     if ! command -v tor >/dev/null; then
         # For safety - do not tamper with pkgs
-        # logger -t "TOR is not installed - trying to install and stopping."
+        # logger -t "Tor is not installed - trying to install and stopping."
         # opkg update && opkg install tor-geoip
-        logger -t "TOR is not installed - stopping."
+        logger -t "Tor is not installed - stopping."
         rm -f /tmp/unlocker_starting.pid 2>/dev/null
         exit 1
     fi
-    logger -t UNLOCKER "TOR is selected - creating chains."
+    logger -t UNLOCKER "Tor is selected - creating chains."
     firewall_create_tor
 
 fi
@@ -71,7 +71,7 @@ if [ "$proxy_mode" = "W" ]; then
         rm -f /tmp/unlocker_starting.pid 2>/dev/null
         exit 1
     fi
-    logger -t UNLOCKER "TOR is selected - creating chains."
+    logger -t UNLOCKER "Tor is selected - creating chains."
     firewall_create_wg
 
 fi
@@ -246,7 +246,7 @@ firewall_create_tor()
     network_get_subnets subnets4 lan
     # udp_proxy=$(uci get unlocker.@unlocker[0].udp_proxy 2>/dev/null)
     # if [ "$udp_proxy" = "1" ]; then
-    #     logger -t UNLOCKER "UDP option selected - but TOR can't do that, sorry."
+    #     logger -t UNLOCKER "UDP option selected - but Tor can't do that, sorry."
     # fi
     
     # Create lists for bypass
@@ -267,7 +267,7 @@ firewall_create_tor()
 
     iptables -t nat -I PREROUTING -p tcp -j unlocker_check 2>/dev/null
 
-    logger -t UNLOCKER "TOR Chain loaded in firewall"
+    logger -t UNLOCKER "Tor Chain loaded in firewall"
 }
 
 firewall_create_wg()

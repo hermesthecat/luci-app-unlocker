@@ -88,10 +88,10 @@ msgstr ""
 msgid "Restart Tor"
 msgstr ""
 
-msgid "Roscomnadzor"
+msgid "Roskomnadzor"
 msgstr ""
 
-msgid "Roscomnadzor (Russia)"
+msgid "Roskomnadzor (Russia)"
 msgstr ""
 
 msgid "Services Status:"
@@ -100,7 +100,7 @@ msgstr ""
 msgid "Status: (TODO)"
 msgstr ""
 
-msgid "TOR is preferred and free but can't deal with UDP traffic"
+msgid "Tor is preferred and free but can't deal with UDP traffic"
 msgstr ""
 
 msgid "Tor Configuration"

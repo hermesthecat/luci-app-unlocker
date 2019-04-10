@@ -2,7 +2,7 @@
 ========
 
 Модуль для [LuCI](https://github.com/openwrt/luci), позволяющий обойти различные виды IP-блокировок.
-Был разработан, что бы помочь легко сконфигурировать VPN, TOR и другие сетевые утилиты для пропускания необходимого (например заблокированного провайдером) траффика по заданным спискам прямо на роутере под управлением OpenWRT.
+Был разработан, что бы помочь легко сконфигурировать VPN, Tor и другие сетевые утилиты для пропускания необходимого (например заблокированного провайдером) трафика по заданным спискам прямо на роутере под управлением OpenWRT.
 Списки возможно добавлять свои, или использовать уже подготовленные.
 
 На данный момент реализован функционал работы в связке с Tor и авто-обновление списка заблокированных IP.
@@ -19,7 +19,7 @@ Currently can only work together with Tor and there are only IP blocklists for R
 
 **[Installation guide](https://gitlab.com/Nooblord/luci-app-unlocker/blob/master/SETUP.en.md)**
 
-Licence
+License
 --------
 
-This app is licenced under the terms of the [GNU GPLv3](https://www.gnu.org/licenses/gpl-3.0.txt)
+This app is licensed under the terms of the [GNU GPLv3](https://www.gnu.org/licenses/gpl-3.0.txt)
