@@ -114,7 +114,7 @@ iplists = s:taboption("basic",StaticList,"iplists",translate("IPv4 Bypass Lists"
 					  translate("Multiple selection is allowed."))
 iplists.widget = "select"
 iplists:depends("enabled","1")
-iplists:value("RKNIPLIST",translate("Roscomnadzor (Russia)"))
+iplists:value("RKNIPLIST",translate("Roskomnadzor (Russia)"))
 --iplists:value("GFWIPLIST",translate("Great Firewall IPv4 (China)"))
 iplists:value("CUSTOMIPLIST",translate("Custom IPv4"))
 
@@ -127,7 +127,7 @@ iplists:value("CUSTOMIPLIST",translate("Custom IPv4"))
 
 
 proxy_mode = s:taboption("basic",ListValue, "proxy_mode", translate("Bypass Mode"),
-		translate("TOR is preferred and free but can't deal with UDP traffic"))
+		translate("Tor is preferred and free but can't deal with UDP traffic"))
 proxy_mode:value("D", translate("Disabled"))
 proxy_mode:value("T", translate("Use Tor network"))
 if luci.util.exec("/usr/bin/which wg") ~= "" then
@@ -139,7 +139,7 @@ end
 -- [ADVANCED LISTS SETTINGS TAB] ----------------------------------------------
 s:tab("listsettings",  translate("Advanced IP-List Settings"))
 -- rknListStatus = s:taboption("listsettings",DummyValue,"rknListStatus",
--- 							translate("Roscomnadzor"))
+-- 							translate("Roskomnadzor"))
 -- rknListStatus:depends("iplists","RKNIPLIST")
 -- gfwListStatus:depends("iplists","GFWIPLIST")
 -- rknListStatus.rawhtml = true
@@ -148,7 +148,7 @@ s:tab("listsettings",  translate("Advanced IP-List Settings"))
 -- end
 
 rknListOptions = s:taboption("listsettings",MultiValue,"rknListOptions",
-				   translate("Roscomnadzor (Russia)"))
+				   translate("Roskomnadzor (Russia)"))
 --				   translate("Currently list is just loaded on boot."))
 rknListOptions:depends("iplists","RKNIPLIST")
 rknListOptions:depends("iplists","GFWIPLIST")
