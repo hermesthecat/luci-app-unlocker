@@ -71,7 +71,7 @@ if [ "$proxy_mode" = "W" ]; then
         rm -f /tmp/unlocker_starting.pid 2>/dev/null
         exit 1
     fi
-    logger -t UNLOCKER "Tor is selected - creating chains."
+    logger -t UNLOCKER "WireGuard is selected - creating chains."
     firewall_create_wg
 
 fi
@@ -147,7 +147,7 @@ update_rkniplist()
             wget -qO - $ipset_download_link/$name | sed '1d' | ipset restore
         done
 
-        logger -t UNLOCKER "Set RKNIPLIST is updated and loaded in memory"
+        logger -t UNLOCKER "Set RKNIPLIST was updated and loaded in memory"
     fi
 }
 
@@ -164,7 +164,7 @@ update_customiplist()
             cat /etc/unlocker.ipv4net | ipset restore 2>/dev/null || \
             cat /etc/unlocker.ipv4net | sed '1d' | ipset restore 2>/dev/null
         fi
-        logger -t UNLOCKER "Custom IPSET rules are updated and loaded in memory"
+        logger -t UNLOCKER "Custom ipset was read and loaded in memory"
 }
 
 cron_rkniplist_add()
