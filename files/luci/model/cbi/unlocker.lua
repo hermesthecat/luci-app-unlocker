@@ -38,7 +38,7 @@ end
 -- gets ipv4 subnet from line
 -- @return string
 function filterSubnet(line)
-	local a,b,c,d,e=ip:match("^(%d%d?%d?)%.(%d%d?%d?)%.(%d%d?%d?)%.(%d%d?%d?)/?(%d?%d?).+$")
+	local a,b,c,d,e=line:match("^(%d%d?%d?)%.(%d%d?%d?)%.(%d%d?%d?)%.(%d%d?%d?)/?(%d?%d?).+$")
 	return a .. '.' .. b .. '.' .. c .. '.' .. d .. '/' .. e
 end
 -------------------------------------------------------------------------------
