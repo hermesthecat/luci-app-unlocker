@@ -4,7 +4,7 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=luci-app-unlocker
-PKG_VERSION:=1.45
+PKG_VERSION:=1.46
 PKG_RELEASE:=10
 PKG_MAINTAINER:=Alex D <alex@dreamisdead.tk>
 PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)
@@ -23,7 +23,7 @@ define Package/$(PKG_NAME)/description
 endef
 
 define Package/$(PKG_NAME)/conffiles
-	/etc/config/unlocker
+/etc/config/unlocker
 endef
 
 define Build/Configure
