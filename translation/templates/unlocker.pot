@@ -37,6 +37,11 @@ msgstr ""
 msgid "ENABLED on boot"
 msgstr ""
 
+msgid ""
+"Each ip or subnet must start at the beginning of line (comments like this "
+"line are allowed)"
+msgstr ""
+
 msgid "Enable Unlocker"
 msgstr ""
 
@@ -44,6 +49,9 @@ msgid "Enable list auto-update"
 msgstr ""
 
 msgid "Enable start on boot"
+msgstr ""
+
+msgid "Example of custom list:"
 msgstr ""
 
 msgid "Example:"
@@ -100,9 +108,6 @@ msgstr ""
 msgid "Status: (TODO)"
 msgstr ""
 
-msgid "Tor is preferred and free but can't deal with UDP traffic"
-msgstr ""
-
 msgid "Tor Configuration"
 msgstr ""
 
@@ -113,6 +118,9 @@ msgid "Tor is not Installed"
 msgstr ""
 
 msgid "Tor is not Running"
+msgstr ""
+
+msgid "Tor is preferred and free but can't deal with UDP traffic"
 msgstr ""
 
 msgid "Tor log"
@@ -139,7 +147,13 @@ msgstr ""
 msgid "Use WireGuard VPN"
 msgstr ""
 
+msgid "also a comment"
+msgstr ""
+
 msgid "and"
+msgstr ""
+
+msgid "excluded"
 msgstr ""
 
 msgid "with PID"

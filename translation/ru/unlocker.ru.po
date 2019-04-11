@@ -37,6 +37,13 @@ msgstr "Список доменов"
 msgid "ENABLED on boot"
 msgstr "ВКЛЮЧЕН при загрузке"
 
+msgid ""
+"Each ip or subnet must start at the beginning of line (comments like this "
+"line are allowed)"
+msgstr ""
+"IP адрес или подсеть должны идти в начале строки (можно использовать "
+"комментарии как этот)"
+
 msgid "Enable Unlocker"
 msgstr "Включить Разблокировщик"
 
@@ -45,6 +52,9 @@ msgstr "Включить авто-обновление"
 
 msgid "Enable start on boot"
 msgstr "Загружать при старте"
+
+msgid "Example of custom list:"
+msgstr "Пример своего списка:"
 
 msgid "Example:"
 msgstr "Пример:"
@@ -102,11 +112,6 @@ msgstr "Статус сервисов:"
 msgid "Status: (TODO)"
 msgstr "Статус: (TODO)"
 
-msgid "Tor is preferred and free but can't deal with UDP traffic"
-msgstr ""
-"Рекомендуется использовать Tor, он бесплатен, но не может проксировать UDP "
-"траффик"
-
 msgid "Tor Configuration"
 msgstr "Настройки Tor"
 
@@ -118,6 +123,11 @@ msgstr "Tor не установлен"
 
 msgid "Tor is not Running"
 msgstr "Tor не запущен"
+
+msgid "Tor is preferred and free but can't deal with UDP traffic"
+msgstr ""
+"Рекомендуется использовать Tor, он бесплатен, но не может проксировать UDP "
+"траффик"
 
 msgid "Tor log"
 msgstr "Журнал Tor"
@@ -143,8 +153,14 @@ msgstr "Использовать Tor"
 msgid "Use WireGuard VPN"
 msgstr "Использовать WireGuard"
 
+msgid "also a comment"
+msgstr "так же комментарий"
+
 msgid "and"
 msgstr "и"
+
+msgid "excluded"
+msgstr "исключён"
 
 msgid "with PID"
 msgstr "c PID"
