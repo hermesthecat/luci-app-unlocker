@@ -7,7 +7,7 @@ require "ubus"
 -- @return true or false
 function isIpAddressOrSubnet(ip)
  if not ip then return false end
- local a,b,c,d,e=ip:match("^(%d%d?%d?)%.(%d%d?%d?)%.(%d%d?%d?)%.(%d%d?%d?)/?(%d?%d?)$")
+ local a,b,c,d,e=ip:match("^(%d%d?%d?)%.(%d%d?%d?)%.(%d%d?%d?)%.(%d%d?%d?)/?(%d?%d?).+$")
  a=tonumber(a)
  b=tonumber(b)
  c=tonumber(c)
@@ -26,6 +26,20 @@ function isIpAddressOrSubnet(ip)
  else
  	return false
  end
+end
+
+-- gets ipv4 address from line
+-- @return string
+function filterIP(line)
+	local a,b,c,d=line:match("^(%d%d?%d?)%.(%d%d?%d?)%.(%d%d?%d?)%.(%d%d?%d?).+$")
+	return a .. '.' .. b .. '.' .. c .. '.' .. d
+end
+
+-- gets ipv4 subnet from line
+-- @return string
+function filterSubnet(line)
+	local a,b,c,d,e=ip:match("^(%d%d?%d?)%.(%d%d?%d?)%.(%d%d?%d?)%.(%d%d?%d?)/?(%d?%d?).+$")
+	return a .. '.' .. b .. '.' .. c .. '.' .. d .. '/' .. e
 end
 -------------------------------------------------------------------------------
 
@@ -170,9 +184,16 @@ rknListOptions:value("RKNLISTCRON",translate("Enable list auto-update"))
 -- gfwListOptions:value("GFWLISTCRON",translate("Enable list auto-update"))
 
 customListOptions = s:taboption("listsettings",TextValue, "customListOptions",
-	translate("Custom IPv4"),translate("Example:") .. brtag .. bold ..
+	translate("Custom IPv4"),translate("Example of custom list:") .. brtag .. bold ..
+							 "# " .. translate("Each ip or subnet must start at the beginning of line" ..
+							 " (comments like this line are allowed)") .. brtag ..
 							 "123.123.123.123" .. brtag ..
-							 "143.143.143.143" .. brtag ..
+							 "143.143.143.143" .. fontgreen ..
+							 " # " .. translate("also a comment") ..
+							 endfont .. brtag ..
+							 fontred .. "" ..
+							 "#163.163.163.163" .. " (" ..
+							 translate("excluded") .. ")" .. endfont .. brtag ..
 							 "111.111.111.0/24" .. endbold
 							 )
 customListOptions:depends("iplists","RKNIPLIST")
@@ -213,12 +234,11 @@ function customListOptions.write(self, section, value)
 		newvalue,customIPValue,customIPNETValue="","",""
 		for line in value:gmatch("[^\r\n]+") do
 			test = isIpAddressOrSubnet(line)
+			newvalue = newvalue .. line .. "\n"
 			if test == "ip" then
-				newvalue = newvalue .. line .. "\n"
-				customIPValue = customIPValue .. "add custom_ip " .. line .. "\n"
+				customIPValue = customIPValue .. "add custom_ip " .. filterIP(line) .. "\n"
 			elseif test == "subnet" then
-				newvalue = newvalue .. line .. "\n"
-				customIPNETValue = customIPNETValue .. "add custom_net " .. line .. "\n"
+				customIPNETValue = customIPNETValue .. "add custom_net " .. filterSubnet(line) .. "\n"
 			end
 		end
 		value=newvalue
