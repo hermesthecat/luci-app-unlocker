@@ -31,14 +31,14 @@ end
 -- gets ipv4 address from line
 -- @return string
 function filterIP(line)
-	local a,b,c,d=line:match("^(%d%d?%d?)%.(%d%d?%d?)%.(%d%d?%d?)%.(%d%d?%d?).+$")
+	local a,b,c,d=line:match("^(%d%d?%d?)%.(%d%d?%d?)%.(%d%d?%d?)%.(%d%d?%d?)%D*$")
 	return a .. '.' .. b .. '.' .. c .. '.' .. d
 end
 
 -- gets ipv4 subnet from line
 -- @return string
 function filterSubnet(line)
-	local a,b,c,d,e=line:match("^(%d%d?%d?)%.(%d%d?%d?)%.(%d%d?%d?)%.(%d%d?%d?)/?(%d?%d?).+$")
+	local a,b,c,d,e=line:match("^(%d%d?%d?)%.(%d%d?%d?)%.(%d%d?%d?)%.(%d%d?%d?)/?(%d?%d?)%D*$")
 	return a .. '.' .. b .. '.' .. c .. '.' .. d .. '/' .. e
 end
 -------------------------------------------------------------------------------
