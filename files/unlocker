@@ -113,42 +113,59 @@ ipset_create()
 
 update_rkniplist()
 {
-    local rkniplistcron
+    local rknlistoptions
     local ipset_download_link
-    rkniplistcron=$(uci get unlocker.@unlocker[0].rknListOptions 2>/dev/null)
+    local use_lite_list
+    rknlistoptions=$(uci get unlocker.@unlocker[0].rknListOptions 2>/dev/null)
     
-    # determine if device supports https TODO
+    # determine if device supports https
 
-    if [[ "$(wget -qO - https://nooblord.gitlab.io/ipset-lists/rkn_net.ipset | grep create )" != "" ]]; then
+    if [ "$(wget -qO - https://nooblord.gitlab.io/ipset-lists/rkn_net.ipset | grep create )" != "" ]; then
         ipset_download_link="https://nooblord.gitlab.io/ipset-lists"
     else
         ipset_download_link="http://lists.unlocker.xyz"
     fi
 
 
-    if [ "$rkniplistcron" = "RKNLISTCRON" ]; then
+    if echo "$rknlistoptions" | grep -q "RKNLISTCRON"; then
         cron_rkniplist_add
     else
         cron_rkniplist_del
     fi
 
-    if [[ "$(ping -c 1 8.8.8.8 | grep '100% packet loss' )" != "" ]]; then
+    if echo "$rknlistoptions" | grep -q "RKNLISTLITE" ; then
+        use_lite_list=1
+    fi
 
+
+    if [ "$(ping -c 1 8.8.8.8 | grep '100% packet loss' )" != "" ]; then
         logger -t UNLOCKER "Can not update list - internet is down."
+    elif [ "$use_lite_list" = 1 ]; then
+        logger -t UNLOCKER "Starting RKNIPLIST update (lite version)"
+        destroy_or_flush_rknlist
+        for name in $(wget -qO - $ipset_download_link/rkn_lite.sets); do
+            wget -qO - $ipset_download_link/"$name" | ipset restore || \
+            wget -qO - $ipset_download_link/"$name" | sed '1d' | ipset restore
+        done
+        logger -t UNLOCKER "Set RKNIPLIST (lite version) was updated and loaded in memory"
     else
         logger -t UNLOCKER "Starting RKNIPLIST update"
-
-        for name in $(ipset list -name | grep rkn); do
-            ipset destroy $name 2>/dev/null || ipset flush $name 2>/dev/null
-        done
+        destroy_or_flush_rknlist
 
         for name in $(wget -qO - $ipset_download_link/rkn.sets); do
-            wget -qO - $ipset_download_link/$name | ipset restore || \
-            wget -qO - $ipset_download_link/$name | sed '1d' | ipset restore
+            wget -qO - $ipset_download_link/"$name" | ipset restore || \
+            wget -qO - $ipset_download_link/"$name" | sed '1d' | ipset restore
         done
 
         logger -t UNLOCKER "Set RKNIPLIST was updated and loaded in memory"
     fi
+}
+
+destroy_or_flush_rknlist()
+{
+    for name in $(ipset list -name | grep rkn); do
+        ipset destroy "$name" 2>/dev/null || ipset flush "$name" 2>/dev/null
+    done
 }
 
 update_customiplist()

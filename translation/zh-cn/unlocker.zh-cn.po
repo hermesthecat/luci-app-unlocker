@@ -147,6 +147,9 @@ msgstr ""
 msgid "Use WireGuard VPN"
 msgstr ""
 
+msgid "Use lite (low-ram) version of list"
+msgstr ""
+
 msgid "also a comment"
 msgstr ""
 

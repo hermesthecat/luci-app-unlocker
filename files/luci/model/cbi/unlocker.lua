@@ -38,7 +38,7 @@ end
 -- gets ipv4 subnet from line
 -- @return string
 function filterSubnet(line)
-	local a,b,c,d,e=line:match("^(%d%d?%d?)%.(%d%d?%d?)%.(%d%d?%d?)%.(%d%d?%d?)/?(%d?%d?)%D*$")
+	local a,b,c,d,e=line:match("^(%d%d?%d?)%.(%d%d?%d?)%.(%d%d?%d?)%.(%d%d?%d?)/(%d%d?)%D*$")
 	return a .. '.' .. b .. '.' .. c .. '.' .. d .. '/' .. e
 end
 -------------------------------------------------------------------------------
@@ -167,6 +167,7 @@ rknListOptions = s:taboption("listsettings",MultiValue,"rknListOptions",
 rknListOptions:depends("iplists","RKNIPLIST")
 rknListOptions:depends("iplists","GFWIPLIST")
 rknListOptions:value("RKNLISTCRON",translate("Enable list auto-update"))
+rknListOptions:value("RKNLISTLITE",translate("Use lite (low-ram) version of list"))
 
 -- gfwListStatus = s:taboption("listsettings",DummyValue,"gfwListStatus",
 -- 							translate("Great Firewall"))

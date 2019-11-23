@@ -153,6 +153,9 @@ msgstr "Использовать Tor"
 msgid "Use WireGuard VPN"
 msgstr "Использовать WireGuard"
 
+msgid "Use lite (low-ram) version of list"
+msgstr "Использовать оптимизированный список адресов (сокращает потребление RAM)"
+
 msgid "also a comment"
 msgstr "так же комментарий"
 
