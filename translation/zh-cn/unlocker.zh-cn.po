@@ -7,6 +7,9 @@ msgstr ""
 msgid "Base Setting"
 msgstr ""
 
+msgid "By ticking this box bypass rules will also be applied to router itself"
+msgstr ""
+
 msgid "Bypass Mode"
 msgstr ""
 
@@ -46,6 +49,9 @@ msgid "Enable Unlocker"
 msgstr ""
 
 msgid "Enable list auto-update"
+msgstr ""
+
+msgid "Enable on router"
 msgstr ""
 
 msgid "Enable start on boot"
@@ -150,13 +156,13 @@ msgstr ""
 msgid "Use lite (low-ram) version of list"
 msgstr ""
 
-msgid "also a comment"
-msgstr ""
-
 msgid "and"
 msgstr ""
 
-msgid "excluded"
+msgid "this is a comment"
+msgstr ""
+
+msgid "use !x.x.x.x/xx syntax to exclude ip or subnet"
 msgstr ""
 
 msgid "with PID"

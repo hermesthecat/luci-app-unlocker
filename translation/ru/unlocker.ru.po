@@ -7,6 +7,9 @@ msgstr "Доп. опции IP списка"
 msgid "Base Setting"
 msgstr "Основные настройки"
 
+msgid "By ticking this box bypass rules will also be applied to router itself"
+msgstr "Дополнительно применить все правила обхода на сам роутер, а не только для пользователей локальной сети"
+
 msgid "Bypass Mode"
 msgstr "Способ обхода"
 
@@ -49,6 +52,9 @@ msgstr "Включить Разблокировщик"
 
 msgid "Enable list auto-update"
 msgstr "Включить авто-обновление"
+
+msgid "Enable on router"
+msgstr ""
 
 msgid "Enable start on boot"
 msgstr "Загружать при старте"
@@ -154,16 +160,17 @@ msgid "Use WireGuard VPN"
 msgstr "Использовать WireGuard"
 
 msgid "Use lite (low-ram) version of list"
-msgstr "Использовать оптимизированный список адресов (сокращает потребление RAM)"
-
-msgid "also a comment"
-msgstr "так же комментарий"
+msgstr ""
+"Использовать оптимизированный список адресов (сокращает потребление RAM)"
 
 msgid "and"
 msgstr "и"
 
-msgid "excluded"
-msgstr "исключён"
+msgid "this is a comment"
+msgstr "просто комментарий"
+
+msgid "use !x.x.x.x/xx syntax to exclude ip or subnet"
+msgstr "можно использовать восклицательный знак в начале строки что бы исключить ip или подсеть"
 
 msgid "with PID"
 msgstr "c PID"
