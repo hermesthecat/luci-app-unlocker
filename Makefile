@@ -4,8 +4,8 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=luci-app-unlocker
-PKG_VERSION:=1.5
-PKG_RELEASE:=14
+PKG_VERSION:=1.51
+PKG_RELEASE:=15
 PKG_MAINTAINER:=Alex D <alex@dreamisdead.tk>
 PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)
 
