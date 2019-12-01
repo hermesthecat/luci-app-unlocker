@@ -7,7 +7,7 @@ require "ubus"
 -- @return true or false
 function isIpAddressOrSubnet(ip)
  if not ip then return false end
- local a,b,c,d,e=ip:match("^(%d%d?%d?)%.(%d%d?%d?)%.(%d%d?%d?)%.(%d%d?%d?)/?(%d?%d?).+$")
+ local a,b,c,d,e=ip:match("^(%d%d?%d?)%.(%d%d?%d?)%.(%d%d?%d?)%.(%d%d?%d?)/?(%d?%d?).-$")
  a=tonumber(a)
  b=tonumber(b)
  c=tonumber(c)
@@ -31,15 +31,26 @@ end
 -- gets ipv4 address from line
 -- @return string
 function filterIP(line)
-	local a,b,c,d=line:match("^(%d%d?%d?)%.(%d%d?%d?)%.(%d%d?%d?)%.(%d%d?%d?)%D*$")
+	local a,b,c,d=line:match("^(%d%d?%d?)%.(%d%d?%d?)%.(%d%d?%d?)%.(%d%d?%d?).-$")
 	return a .. '.' .. b .. '.' .. c .. '.' .. d
 end
 
 -- gets ipv4 subnet from line
 -- @return string
 function filterSubnet(line)
-	local a,b,c,d,e=line:match("^(%d%d?%d?)%.(%d%d?%d?)%.(%d%d?%d?)%.(%d%d?%d?)/(%d%d?)%D*$")
+	local a,b,c,d,e=line:match("^(%d%d?%d?)%.(%d%d?%d?)%.(%d%d?%d?)%.(%d%d?%d?)/(%d%d?).-$")
 	return a .. '.' .. b .. '.' .. c .. '.' .. d .. '/' .. e
+end
+
+-- writes changes to custom lists 
+-- @return nil
+function makeIpsetList(content, file, header)
+	if content ~= "" then
+		content = header .. content
+		nixio.fs.writefile(file, content)
+	elseif nixio.fs.access(file) then
+		nixio.fs.remove(file)
+	end
 end
 -------------------------------------------------------------------------------
 
@@ -50,6 +61,10 @@ local customIP4IPfile = "/etc/unlocker.ipv4ip"
 local customIP4IPheader = "create custom_ip hash:ip family inet maxelem 65536\n"
 local customIP4NETfile = "/etc/unlocker.ipv4net"
 local customIP4NETheader = "create custom_net hash:net family inet maxelem 65536\n"
+local excludeIP4IPfile = "/etc/unlocker.ipv4excip"
+local excludeIP4IPheader = "create exclude_ip hash:ip family inet maxelem 65536\n"
+local excludeIP4NETfile = "/etc/unlocker.ipv4excnet"
+local excludeIP4NETheader = "create exclude_net hash:net family inet maxelem 65536\n"
 local makeTorConfigButtonPressed = false
 local torrcSampleConfig = 'Log notice syslog\n' ..
 						  'DataDirectory /var/lib/tor\n' ..
@@ -142,11 +157,17 @@ iplists:value("CUSTOMIPLIST",translate("Custom IPv4"))
 
 proxy_mode = s:taboption("basic",ListValue, "proxy_mode", translate("Bypass Mode"),
 		translate("Tor is preferred and free but can't deal with UDP traffic"))
+proxy_mode:depends("enabled","1")
 proxy_mode:value("D", translate("Disabled"))
 proxy_mode:value("T", translate("Use Tor network"))
 if luci.util.exec("/usr/bin/which wg") ~= "" then
 	proxy_mode:value("W", translate("Use WireGuard VPN"))
 end
+
+local_proxy = s:taboption("basic",Flag, "local_proxy", translate("Enable on router"),
+				translate("By ticking this box bypass rules will also be applied to router itself"))
+local_proxy:depends("enabled","1")
+local_proxy.rmempty = false
 --proxy_mode:value("S", translate("Use ShadowSocks (TODO)"))
 -------------------------------------------------------------------------------
 
@@ -189,13 +210,12 @@ customListOptions = s:taboption("listsettings",TextValue, "customListOptions",
 							 "# " .. translate("Each ip or subnet must start at the beginning of line" ..
 							 " (comments like this line are allowed)") .. brtag ..
 							 "123.123.123.123" .. brtag ..
-							 "143.143.143.143" .. fontgreen ..
-							 " # " .. translate("also a comment") ..
-							 endfont .. brtag ..
+							 "111.111.111.0/24" .. 
+							 " # " .. translate("this is a comment") ..
+							 brtag ..
 							 fontred .. "" ..
-							 "#163.163.163.163" .. " (" ..
-							 translate("excluded") .. ")" .. endfont .. brtag ..
-							 "111.111.111.0/24" .. endbold
+							 "!163.163.163.163" .. endfont .. " # " ..
+							 translate("use !x.x.x.x/xx syntax to exclude ip or subnet")  .. brtag .. endbold
 							 )
 customListOptions:depends("iplists","RKNIPLIST")
 customListOptions:depends("iplists","GFWIPLIST")
@@ -220,26 +240,35 @@ end
 function customListOptions.write(self, section, value)
 	if value == nil or value == '' then 
 		nixio.fs.writefile(customIP4, "")
-		if nixio.fs.access(customIP4NETfile) then
-			nixio.fs.remove(customIP4NETfile)
-		end
-		if nixio.fs.access(customIP4IPfile) then
-			nixio.fs.remove(customIP4IPfile)
-		end
-		if nixio.fs.access(customIP4) then
-			nixio.fs.remove(customIP4)
+		files = { customIP4NETfile,customIP4IPfile,excludeIP4IPfile,excludeIP4NETfile, customIP4 }
+		for _,file in pairs(files) do
+			if nixio.fs.access(file) then
+				nixio.fs.remove(file)
+			end
 		end
 	--elseif nixio.fs.access(customIP4) then
 	else
 		value = value:gsub("\r\n?", "\n")
-		newvalue,customIPValue,customIPNETValue="","",""
+		newvalue,customIPValue,excludeIPValue,customIPNETValue,excludeIPNETValue="","","","",""
 		for line in value:gmatch("[^\r\n]+") do
-			test = isIpAddressOrSubnet(line)
 			newvalue = newvalue .. line .. "\n"
+			exclude = line:sub(1, 1)=="!"
+			if exclude then
+				line = line:sub(2)
+			end
+			test = isIpAddressOrSubnet(line)
 			if test == "ip" then
-				customIPValue = customIPValue .. "add custom_ip " .. filterIP(line) .. "\n"
+				if exclude then
+					excludeIPValue = excludeIPValue .. "add exclude_ip " .. filterIP(line) .. "\n"
+				else
+					customIPValue = customIPValue .. "add custom_ip " .. filterIP(line) .. "\n"
+				end
 			elseif test == "subnet" then
-				customIPNETValue = customIPNETValue .. "add custom_net " .. filterSubnet(line) .. "\n"
+				if exclude then
+					excludeIPNETValue = excludeIPNETValue .. "add exclude_net " .. filterSubnet(line) .. "\n"
+				else
+					customIPNETValue = customIPNETValue .. "add custom_net " .. filterSubnet(line) .. "\n"
+				end
 			end
 		end
 		value=newvalue
@@ -255,18 +284,10 @@ function customListOptions.write(self, section, value)
 			elseif nixio.fs.access(customIP4) then
 				nixio.fs.remove(customIP4)
 			end
-			if customIPValue ~= "" then
-				customIPValue = customIP4IPheader .. customIPValue
-				nixio.fs.writefile(customIP4IPfile, customIPValue)
-			elseif nixio.fs.access(customIP4IPfile) then
-				nixio.fs.remove(customIP4IPfile)
-			end			
-			if customIPNETValue ~= "" then
-				customIPNETValue = customIP4NETheader .. customIPNETValue
-				nixio.fs.writefile(customIP4NETfile, customIPNETValue)
-			elseif nixio.fs.access(customIP4NETfile) then
-				nixio.fs.remove(customIP4NETfile)
-			end
+			makeIpsetList(customIPValue, customIP4IPfile, customIP4IPheader)
+			makeIpsetList(customIPNETValue, customIP4NETfile, customIP4NETheader)
+			makeIpsetList(excludeIPValue, excludeIP4IPfile, excludeIP4IPheader)
+			makeIpsetList(excludeIPNETValue, excludeIP4NETfile, excludeIP4NETheader)
 		end
 	-- elseif not nixio.fs.access(customIP4) then
 	-- 	nixio.fs.writefile(customIP4, value)
