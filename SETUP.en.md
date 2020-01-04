@@ -25,6 +25,8 @@
 ![image](https://gitlab.com/Nooblord/luci-app-unlocker/raw/master/screenshots/setup1.en.png)
 - Go to  "Tor Configuration" tab and edit torrc according to example below and save form or just press "Make me Tor Config" button, after that ***restart Tor service*** with "Restart Tor" button
 ![image](https://gitlab.com/Nooblord/luci-app-unlocker/raw/master/screenshots/setup2.en.png)
+> If using custom Tor config, please make sure Tor proxy listens on port 9040 and accepts traffic from local network  
+> Option `TransPort 0.0.0.0:9040`
 - Press "save and apply", done!
 - Check if plugin is working correctly and if not - check logs
 
