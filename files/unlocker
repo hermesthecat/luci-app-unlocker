@@ -1,5 +1,5 @@
 #!/bin/sh /etc/rc.common
-# Copyright 2018 Alex D (https://gitlab.com/Nooblord/)
+# Copyright 2018-2020 Alex D (https://gitlab.com/Nooblord/)
 # This is free software, licensed under the GNU General Public License v3.
 
 START=99
@@ -214,7 +214,8 @@ cron_rkniplist_del()
 
 determine_wg_l3_name()
 {
-    ubus call network.interface dump | jsonfilter -e '@.interface[@.proto="wireguard"].l3_device'
+    # TODO: interface selection (get first one for now)
+    ubus call network.interface dump | jsonfilter -e '@.interface[@.proto="wireguard"].l3_device' | head -n1
 }
 
 vpnroute_add()

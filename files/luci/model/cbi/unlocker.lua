@@ -1,4 +1,4 @@
--- Copyright 2018 Alex D (https://gitlab.com/Nooblord/)
+-- Copyright 2018-2020 Alex D (https://gitlab.com/Nooblord/)
 -- This is free software, licensed under the GNU General Public License v3.
 
 -- [REQUIRED STUFF] -----------------------------------------------------------

@@ -1,11 +1,11 @@
-# Copyright 2018 Alex D (https://gitlab.com/Nooblord/)
+# Copyright 2018-2020 Alex D (https://gitlab.com/Nooblord/)
 # This is free software, licensed under the GNU General Public License v3.
 
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=luci-app-unlocker
-PKG_VERSION:=1.51
-PKG_RELEASE:=15
+PKG_VERSION:=1.52
+PKG_RELEASE:=16
 PKG_MAINTAINER:=Alex D <alex@dreamisdead.tk>
 PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)
 
@@ -46,11 +46,19 @@ define Package/$(PKG_NAME)/install
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/files/unlocker.include $(1)/etc/unlocker.include
 	$(INSTALL_DIR) $(1)/etc/config
 	$(INSTALL_CONF) $(PKG_BUILD_DIR)/files/unlocker.conf $(1)/etc/config/unlocker
-	
+
+	# Copy LuCI Description and ACL
+	$(INSTALL_DIR) $(1)/usr/share/luci/menu.d
+	$(INSTALL_DATA) $(PKG_BUILD_DIR)/files/rootfs/usr/share/luci/menu.d/luci-app-unlocker.json \
+	$(1)/usr/share/luci/menu.d/luci-app-unlocker.json
+	$(INSTALL_DIR) $(1)/usr/share/rpcd/acl.d
+	$(INSTALL_DATA) $(PKG_BUILD_DIR)/files/rootfs/usr/share/rpcd/acl.d/luci-app-unlocker.json \
+	$(1)/usr/share/rpcd/acl.d/luci-app-unlocker.json
+
 	# Copy translation
 	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/i18n
 	$(INSTALL_DATA) $(PKG_BUILD_DIR)/unlocker.*.lmo $(1)/usr/lib/lua/luci/i18n/
-	
+
 	# Copy web stuff
 	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/controller
 	$(INSTALL_DATA) $(PKG_BUILD_DIR)/files/luci/controller/unlocker.lua \
