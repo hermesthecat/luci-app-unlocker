@@ -278,7 +278,8 @@ firewall_create_tor()
     local udp_proxy
     local subnets4
     local local_proxy
-    network_get_subnets subnets4 lan
+    # network_get_subnets subnets4 lan
+    subnets4=$(get_lan_subnets)
     local_proxy=$(uci get unlocker.@unlocker[0].local_proxy 2>/dev/null)
     # udp_proxy=$(uci get unlocker.@unlocker[0].udp_proxy 2>/dev/null)
     # if [ "$udp_proxy" = "1" ]; then
@@ -324,7 +325,8 @@ firewall_create_wg()
     local local_proxy
     proxy_mode=$(uci get unlocker.@unlocker[0].proxy_mode 2>/dev/null)
     local_proxy=$(uci get unlocker.@unlocker[0].local_proxy 2>/dev/null)
-    network_get_subnets subnets4 lan
+    # network_get_subnets subnets4 lan
+    subnets4=$(get_lan_subnets)
     #udp_proxy=$(uci get unlocker.@unlocker[0].udp_proxy 2>/dev/null)
     
     # Create lists for bypass
@@ -362,6 +364,26 @@ firewall_create_wg()
     fi
 
     logger -t UNLOCKER "WG Chain loaded in firewall"
+}
+
+echo_lan_subnets() {
+    local zone
+    local subnets4
+    zone=$(uci get firewall."$1".name)
+    if [ "$zone" = "lan" ]; then
+        for network in $(uci get firewall."$1".network); do
+            network_get_subnets subnets4 "$network"
+            for subnet in $subnets4; do
+                echo "$subnet"
+            done
+        done
+    fi
+}
+
+get_lan_subnets()
+{
+    config_load firewall
+    config_foreach echo_lan_subnets zone
 }
 
 
